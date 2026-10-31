@@ -1,89 +1,53 @@
-# 🚀 CBIT Hacktoberfest '26 — Project Starter Repository
+# SmallWorld — Camera Trap Explorer
 
-> **Official Public Starter Repository for CBIT Hacktoberfest '26**  
-> *Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad*
+CBIT Hacktoberfest '26 submission for Team 7. SmallWorld turns a Caltech Camera Traps sample into a reviewable wildlife-monitoring dashboard.
 
----
-
-## 📋 Team Information
+## Team
 
 | Attribute | Details |
-| :--- | :--- |
-| **Team Name** | **SmallWorld** |
-| **Team Number** | `TEAM-7` (`HFT26-TEAM-7`) |
-| **Registration ID** | `HFEST26-44VLBLBP` |
-| **Problem Track** | **Track Selection in Progress** |
-| **Domain** | `General Track` |
-| **Team Leader** | Nishita Chintalapati (nishitachintalapati@gmail.com) |
-| **Institution** | Vasavi College of Engineering, Hyderabad |
+| --- | --- |
+| Team | SmallWorld — Team 7 (`HFT26-TEAM-7`) |
+| Registration ID | `HFEST26-44VLBLBP` |
+| Team leader | Nishita Chintalapati |
+| Members | Advaith Reddy Vemula, Aditya Konduru, Manjeswara Sai Aishwarya, Nirek Tiwari |
 
-### 👥 Team Members
+## Setup
 
-| # | Name | Email | Institution |
-| :--- | :--- | :--- | :--- |
-| 1 | Advaith Reddy Vemula | advaithreddy677@gmail.com | KMIT Hyderabad |
-| 2 | Aditya Konduru | adityakonduru7@gmail.com | KMIT Hyderabad |
-| 3 | Manjeswara Sai Aishwarya | manjeswara.aishwarya@gmail.com | KMIT Hyderabad |
-| 4 | Nirek Tiwari | nirektiwari010@gmail.com | KMIT Hyderabad |
-
----
-
-## 🎯 Problem Statement
-
-### **Track Selection in Progress**
-*Domain:* **General Track**
-
-Details regarding the chosen problem statement track and technical requirements.
-
----
-
-## 🛠️ Contribution & Submission Workflow
-
-All teams must follow the official fork-and-pull-request workflow:
-
-1. **Fork this Repository**:
-   - One team member should click the **Fork** button at the top right to fork this upstream repository to your personal/team GitHub account.
-2. **Add Collaborators**:
-   - In your forked repository, navigate to **Settings > Collaborators** and invite all your registered team members.
-3. **Clone & Develop Locally**:
-   ```bash
-   git clone https://github.com/<your-username>/HFT26-TEAM-7.git
-   cd HFT26-TEAM-7
-   git checkout -b feature/prototype
-   ```
-4. **Commit & Push Regularly**:
-   - Make atomic, descriptive commits throughout the hackathon.
-   ```bash
-   git add .
-   git commit -m "feat: implement core solution architecture"
-   git push origin feature/prototype
-   ```
-5. **Open Pull Request (PR) for Final Submission**:
-   - When ready for evaluation, open a **Pull Request** from your fork's `main` branch back to this upstream repository's `main` branch.
-   - **PR Title Format**: `[SUBMISSION] TEAM-7 - SmallWorld - Track Selection in Progress`
-   - **PR Description Checklist**:
-     - 📌 Solution Overview & Approach
-     - 🏗️ Architecture & Tech Stack Details
-     - 🚀 Local Setup & Installation Instructions
-     - 🎥 Demo Video Link / Live Deployment URL
-     - 📸 Key Screenshots & Visuals
-
----
-
-## 📁 Recommended Project Structure
-
-```
-.
-├── src/                  # Source code (Frontend / Backend / ML)
-├── docs/                 # Documentation, architecture diagrams, slides
-├── tests/                # Test suites & verification scripts
-├── README.md             # Your project documentation & presentation
-└── LICENSE               # Open-source license (MIT recommended)
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
----
+The dashboard uses `data/fake_master.csv` for its Overview and Activity tabs. The master CSV begins with the fixed contract:
 
-## ⚠️ Important Rules & Code of Conduct
-* **Upstream Protection**: Do not push directly to this repository's main branch. All evaluation will be conducted on your submitted Pull Request.
-* **Original Work**: All code submitted must be developed during the hackathon timeline. Open-source libraries and frameworks are welcomed with proper attribution.
-* **Code Freeze**: Final Pull Requests must be submitted before the designated hackathon submission deadline.
+`image_id, path, location, datetime, blur_score, status, md_conf, bbox, species, species_conf`
+
+## Pipeline
+
+```bash
+python quality_detect.py --master data/master.csv --output data/master.csv --threshold 50 --md-json path/to/caltech-megadetector.json
+python species.py --master data/master.csv --predictions data/species_predictions.csv --threshold 0.6
+python analytics.py --master data/master.csv
+```
+
+The quality stage computes a resized grayscale Laplacian blur score and records MegaDetector animal boxes. Species confidence at least 0.6 becomes `Identified`; lower confidence becomes `Uncertain`. Analytics groups detections of the same species at the same location within 30 minutes into one encounter, mirroring workflows commonly handled with camtraptor and camtrapR.
+
+For an optional aggregate-only Featherless summary:
+
+```bash
+export FEATHERLESS_API_KEY="your_key"
+export FEATHERLESS_MODEL="your_model_id"
+python summary.py --input data/summary.json
+```
+
+The included sample metadata covers 2,500 images; the source image files are available from [LILA](https://lila.science/datasets/caltech-camera-traps). The sample is for a demo and not a population estimate.
+
+## Submission
+
+Open a pull request from this fork's `main` branch to `cbitosc/HFT26-TEAM-7:main` with title:
+
+`[SUBMISSION] TEAM-7 - SmallWorld - Camera Trap Explorer`
+
+Include the approach, architecture, local setup, demo URL or recording, and screenshots.
