@@ -10,6 +10,7 @@ import pandas as pd
 def analyze(master: pd.DataFrame, gap_minutes: int = 30) -> tuple[pd.DataFrame, dict]:
     df = master.copy()
     df["datetime"] = pd.to_datetime(df["datetime"], errors="coerce", utc=True)
+    df["species_conf"] = pd.to_numeric(df["species_conf"], errors="coerce")
     identified = df[df["status"].eq("Identified") & df["species"].notna()].copy()
     identified = identified.sort_values(["location", "species", "datetime"])
     delta = identified.groupby(["location", "species"])["datetime"].diff().dt.total_seconds().div(60)
@@ -21,7 +22,7 @@ def analyze(master: pd.DataFrame, gap_minutes: int = 30) -> tuple[pd.DataFrame, 
         start_time=("datetime", "min"), end_time=("datetime", "max"), image_count=("image_id", "count"),
         mean_confidence=("species_conf", "mean"),
     )
-    df["hour"] = df["datetime"].dt.hour
+    identified["hour"] = identified["datetime"].dt.hour
     confidence = pd.to_numeric(df.loc[df["status"].isin(["Identified", "Uncertain"]), "species_conf"], errors="coerce")
     summary = {
         "image_count": int(len(df)),
