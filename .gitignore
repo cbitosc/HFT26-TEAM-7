@@ -1,0 +1,18 @@
+eccv_18_all_images_sm.tar.gz
+eccv_18_annotations.tar.gz
+__pycache__/
+*.py[cod]
+
+# SmallWorld pipeline + dashboard (local-only files)
+.env
+venv/
+.venv/
+data/raw/
+data/processed/
+data/db/
+models/*.pt
+megadetector_output/
+megadetector_predictions.json
+test_predictions.json
+test.png
+.DS_Store
