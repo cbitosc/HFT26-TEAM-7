@@ -1,0 +1,10 @@
+megadetector
+speciesnet
+torch
+torchvision
+opencv-python
+Pillow
+streamlit
+pandas
+python-dotenv
+openai
